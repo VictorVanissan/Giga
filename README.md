@@ -1,1 +1,1 @@
-Programa feito por Emannuel e Victor Vanissan para ajudar a realizar o calculo do proporcional na troca de plano e aplicação de desconto.
+Programa feito por Emanuel e Victor Vanissan para ajudar a realizar o calculo do proporcional na troca de plano e aplicação de desconto.
