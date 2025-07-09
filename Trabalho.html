@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Calculadora de proporcional Criado por Emanuel & Victor Dantas</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .result-box {
+      transition: all 0.3s ease;
+      max-height: 0;
+      overflow: hidden;
+    }
+    .result-box.show {
+      max-height: 500px;
+      padding: 1rem;
+      margin-top: 1rem;
+    }
+    .input-error {
+      border-color: #ef4444;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+  <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl">
+    <div class="text-center mb-6">
+      <h1 class="text-4xl font-bold text-gray-800">Calculadora de proporcional</h1>
+      <p class="text-sm text-gray-500 mt-1">Criado por Emanuel & Victor Dantas</p>
+    </div>
+    <p class="text-gray-600 mb-6 text-center">Calcule o valor proporcional da fatura após troca de plano</p>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      <div>
+        <label for="billingDate" class="block text-sm font-medium text-gray-700 mb-1">Dia do fechamento da fatura</label>
+        <input type="number" id="billingDate" min="1" max="31" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" placeholder="Ex: 20">
+      </div>
+      <div>
+        <label for="changeDate" class="block text-sm font-medium text-gray-700 mb-1">Dia da troca do plano</label>
+        <input type="number" id="changeDate" min="1" max="31" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" placeholder="Ex: 9">
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      <div>
+        <label for="oldPlanValue" class="block text-sm font-medium text-gray-700 mb-1">Valor do plano antigo (R$)</label>
+        <input type="number" step="0.01" id="oldPlanValue" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" placeholder="Ex: 79.99">
+      </div>
+      <div>
+        <label for="newPlanValue" class="block text-sm font-medium text-gray-700 mb-1">Valor do plano novo (R$)</label>
+        <input type="number" step="0.01" id="newPlanValue" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" placeholder="Ex: 57.99">
+      </div>
+    </div>
+
+    <div class="mb-6">
+      <label for="billingCycleDays" class="block text-sm font-medium text-gray-700 mb-1">Dias do ciclo de faturamento</label>
+      <input type="number" id="billingCycleDays" min="28" max="31" value="30" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">
+    </div>
+
+    <button id="calculateBtn" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors">
+      Calcular Proporcional
+    </button>
+
+    <div id="resultBox" class="result-box bg-gray-50 rounded-md">
+      <h3 class="text-lg font-semibold text-gray-800 mb-3">Resultado do Cálculo</h3>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div class="bg-white p-3 rounded border border-gray-200">
+          <p class="text-sm text-gray-600">Dias com plano antigo</p>
+          <p id="daysOldPlan" class="font-bold text-gray-800">-</p>
+        </div>
+        <div class="bg-white p-3 rounded border border-gray-200">
+          <p class="text-sm text-gray-600">Dias com plano novo</p>
+          <p id="daysNewPlan" class="font-bold text-gray-800">-</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div class="bg-white p-3 rounded border border-gray-200">
+          <p class="text-sm text-gray-600">Valor proporcional plano antigo</p>
+          <p id="proportionalOld" class="font-bold text-gray-800">R$ 0,00</p>
+        </div>
+        <div class="bg-white p-3 rounded border border-gray-200">
+          <p class="text-sm text-gray-600">Valor proporcional plano novo</p>
+          <p id="proportionalNew" class="font-bold text-gray-800">R$ 0,00</p>
+        </div>
+      </div>
+
+      <div class="bg-indigo-50 p-3 rounded border border-indigo-100">
+        <p class="text-sm text-gray-600">Valor total da fatura</p>
+        <p id="totalAmount" class="font-bold text-indigo-700 text-xl">R$ 0,00</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('calculateBtn').addEventListener('click', function () {
+      const billingDate = parseInt(document.getElementById('billingDate').value);
+      const changeDate = parseInt(document.getElementById('changeDate').value);
+      const oldPlanValue = parseFloat(document.getElementById('oldPlanValue').value);
+      const newPlanValue = parseFloat(document.getElementById('newPlanValue').value);
+      const billingCycleDays = parseInt(document.getElementById('billingCycleDays').value);
+
+      if (
+        isNaN(billingDate) || billingDate < 1 || billingDate > 31 ||
+        isNaN(changeDate) || changeDate < 1 || changeDate > 31 ||
+        isNaN(oldPlanValue) || oldPlanValue <= 0 ||
+        isNaN(newPlanValue) || newPlanValue <= 0 ||
+        isNaN(billingCycleDays) || billingCycleDays < 28 || billingCycleDays > 31
+      ) {
+        alert("Por favor, preencha todos os campos corretamente.");
+        return;
+      }
+
+      let daysOld;
+      if (changeDate >= billingDate) {
+        daysOld = changeDate - billingDate;
+      } else {
+        daysOld = billingCycleDays - (billingDate - changeDate);
+      }
+
+      const daysNew = billingCycleDays - daysOld;
+
+      // Calcular valores proporcionais
+      const proportionalValueOld = (oldPlanValue / billingCycleDays) * daysOld;
+      const proportionalValueNew = (newPlanValue / billingCycleDays) * daysNew;
+      const total = proportionalValueOld + proportionalValueNew;
+
+      // Exibir resultados
+      document.getElementById('daysOldPlan').textContent = daysOld + ' dias';
+      document.getElementById('daysNewPlan').textContent = daysNew + ' dias';
+      document.getElementById('proportionalOld').textContent = 'R$ ' + proportionalValueOld.toFixed(2).replace('.', ',');
+      document.getElementById('proportionalNew').textContent = 'R$ ' + proportionalValueNew.toFixed(2).replace('.', ',');
+      document.getElementById('totalAmount').textContent = 'R$ ' + total.toFixed(2).replace('.', ',');
+
+      document.getElementById('resultBox').classList.add('show');
+    });
+  </script>
+</body>
+</html>
