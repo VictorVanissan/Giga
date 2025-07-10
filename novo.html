@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Calculadora de Desconto em Planos</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+        .calculator-container {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        .calculator-container:hover {
+            box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.15);
+        }
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+        .range-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #4f46e5;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        .result-card {
+            background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+        }
+        footer>p{
+            margin-bottom: 25px;
+            text-align: center;
+            font-size: 20px;
+            color: #4338CA;
+        }
+</style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+<div class="flex-grow flex items-center justify-center p-4">
+    <div class="calculator-container bg-white rounded-xl w-full max-w-md overflow-hidden">
+        <div class="bg-indigo-600 p-6 text-white">
+            <h1 class="text-2xl font-bold">Calculadora de Desconto</h1>
+            <p class="text-indigo-100 mb-2">Calcule o valor final do seu plano</p>
+            <p class="text-indigo-200 text-xs italic">Criado por Emanuel & Victor Vanissan</p>
+        </div>
+        <div class="p-6 space-y-6">
+            <div>
+                <label for="valorPlano" class="block text-sm font-medium text-gray-700 mb-1">Valor do Plano</label>
+                <div class="relative rounded-md shadow-sm">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <span class="text-gray-500 sm:text-sm">R$</span>
+                    </div>
+                    <input type="text" id="valorPlano" 
+                           class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-8 pr-12 py-3 sm:text-sm border-gray-300 rounded-md" 
+                           placeholder="00,00" />
+                </div>
+            </div>
+            <div class="pt-2">
+                <label for="percentualDesconto" class="block text-sm font-medium text-gray-700 mb-1">
+                    Percentual de Desconto: <span id="percentualValue" class="text-indigo-600 font-semibold">10%</span>
+                </label>
+                <input type="range" id="percentualDesconto" min="0" max="40" value="10" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-slider" />
+                <div class="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>0%</span>
+                    <span>10%</span>
+                    <span>20%</span>
+                    <span>30%</span>
+                    <span>40%</span>
+                </div>
+            </div>
+            <div class="pt-4">
+                <button id="calcularBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md transition duration-200">Calcular</button>
+            </div>
+        </div>
+        <div id="resultado" class="result-card p-6 text-white hidden">
+            <h2 class="text-lg font-semibold mb-2">Resultado do Cálculo</h2>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-white bg-opacity-20 p-3 rounded-lg">
+                    <p class="text-xs opacity-80">Valor Original</p>
+                    <p id="valorOriginal" class="font-bold text-lg">R$ 0,00</p>
+                </div>
+                <div class="bg-white bg-opacity-20 p-3 rounded-lg">
+                    <p class="text-xs opacity-80">Desconto Aplicado</p>
+                    <p id="valorDesconto" class="font-bold text-lg">10%</p>
+                </div>
+                <div class="col-span-2 bg-white bg-opacity-30 p-4 rounded-lg">
+                    <p class="text-xs opacity-80">Valor Final</p>
+                    <p id="valorFinal" class="font-bold text-2xl">R$ 0,00</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="text-center p-4 text-gray-500 text-sm">
+    <p>
+        <a href="index.html">Calculadora de proporcional</a>
+    </p>
+</footer>
+ 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const valorPlanoInput = document.getElementById('valorPlano');
+    const percentualDescontoInput = document.getElementById('percentualDesconto');
+    const percentualValueSpan = document.getElementById('percentualValue');
+    const calcularBtn = document.getElementById('calcularBtn');
+    const resultadoDiv = document.getElementById('resultado');
+    const valorOriginalP = document.getElementById('valorOriginal');
+    const valorDescontoP = document.getElementById('valorDesconto');
+    const valorFinalP = document.getElementById('valorFinal');
+ 
+    percentualDescontoInput.addEventListener('input', function() {
+        percentualValueSpan.textContent = this.value + '%';
+    });
+ 
+    function formatarMoeda(valor) {
+        return new Intl.NumberFormat('pt-BR', {
+            style: 'currency',
+            currency: 'BRL'
+        }).format(valor);
+    }
+ 
+    function calcularDesconto() {
+        let valorTexto = valorPlanoInput.value.trim();
+ 
+        valorTexto = valorTexto.replace(',', '.').replace(/[^0-9.]/g, '');
+ 
+        const valorPlano = parseFloat(valorTexto) || 0;
+        let percentualDesconto = Math.min(parseFloat(percentualDescontoInput.value), 40);
+ 
+        percentualDescontoInput.value = percentualDesconto;
+        percentualValueSpan.textContent = percentualDesconto + '%';
+ 
+        const valorDesconto = valorPlano * (percentualDesconto / 100);
+        const valorFinal = valorPlano - valorDesconto;
+ 
+        valorOriginalP.textContent = formatarMoeda(valorPlano);
+        valorDescontoP.textContent = percentualDesconto + '%';
+        valorFinalP.textContent = formatarMoeda(valorFinal);
+ 
+        resultadoDiv.classList.remove('hidden');
+    }
+ 
+    calcularBtn.addEventListener('click', calcularDesconto);
+ 
+    valorPlanoInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            calcularDesconto();
+        }
+    });
+});
+</script>
+</body>
+</html>

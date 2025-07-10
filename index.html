@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Calculadora de proporcional Criado por Emanuel & Victor Dantas</title>
+  <title>Calculadora de proporcional Criado por Emanuel & Victor Vanissan</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     .result-box {
@@ -12,16 +12,25 @@
       overflow: hidden;
     }
     .result-box.show {
-      max-height: 500px;
-      padding: 1rem;
-      margin-top: 1rem;
+      max-height: 500px; /* Aumentado para garantir que todo o conteúdo seja visível */
+      padding: 1.5rem; /* Ajustado para corresponder ao padding do card */
+      margin-top: 1.5rem;
     }
     .input-error {
       border-color: #ef4444;
     }
+    footer>p{
+            margin-bottom: 25px;
+            text-align: center;
+            font-size: 25px;
+            color: #4338CA;
+            text-decoration: none;
+        }
   </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+<body class="bg-gray-100 min-h-screen flex flex-col">
+
+<main class="flex-grow flex items-center justify-center p-4">
   <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl">
     <div class="text-center mb-6">
       <h1 class="text-4xl font-bold text-gray-800">Calculadora de proporcional</h1>
@@ -91,6 +100,12 @@
       </div>
     </div>
   </div>
+</main>
+<footer class="text-center p-4 text-gray-500 text-sm">
+    <p>
+      <a href="novo.html">Calculadora de desconto</a>
+    </p>
+</footer>
 
   <script>
     document.getElementById('calculateBtn').addEventListener('click', function () {
@@ -120,12 +135,10 @@
 
       const daysNew = billingCycleDays - daysOld;
 
-      // Calcular valores proporcionais
       const proportionalValueOld = (oldPlanValue / billingCycleDays) * daysOld;
       const proportionalValueNew = (newPlanValue / billingCycleDays) * daysNew;
       const total = proportionalValueOld + proportionalValueNew;
 
-      // Exibir resultados
       document.getElementById('daysOldPlan').textContent = daysOld + ' dias';
       document.getElementById('daysNewPlan').textContent = daysNew + ' dias';
       document.getElementById('proportionalOld').textContent = 'R$ ' + proportionalValueOld.toFixed(2).replace('.', ',');
